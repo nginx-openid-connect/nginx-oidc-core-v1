@@ -12,7 +12,8 @@ export default {
     logout,
     v2logout,
     redirectPostLogin,
-    redirectPostLogout
+    redirectPostLogout,
+    dnsResolverParams
 };
 
 function retryOriginalRequest(r) {
@@ -370,4 +371,17 @@ function getRPInitiatedLogoutArgs(r, idToken) {
 //
 function redirectPostLogout(r) {
     r.return(302, r.variables.post_logout_return_uri);
+}
+
+//
+// Get DNS resolver parameters per host.
+//
+// - The map variable per $host can't be used in server block so js_set is used
+//   to set DNS resolver parameter per host instead.
+// - Example
+//   + 1. resolver 127.0.0.11; # For local Docker DNS lookup of Idp endpoint
+//   + 2. resolver    8.8.8.8; # For global DNS lookup of IDP endpoint
+//
+function dnsResolverParams(r) {
+    r.return(r.variables.oidc_dns_resolver_params);
 }

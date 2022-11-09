@@ -157,7 +157,7 @@ Manual configuration involves reviewing the following files so that they match y
 
   - Modify all of the `map…$oidc_` blocks to match your IdP configuration
   - Modify the URI defined in `map…$oidc_logout_redirect` to specify an unprotected resource to be displayed after requesting the `/logout` location for customers who has been using R28.
-  - Modify the URI defined in `map…$oidc_logout_redirect_uri` to specify an unprotected resource to be displayed after requesting the `/v2/_logout` location for customers who start using R29 and wants to change from `map…$oidc_logout_redirect` to `map…$oidc_logout_redirect_uri` to use the feature of `OIDC RP-Initiated Logout` which is interact with IdP's `end_session_endpoint`.
+  - Modify the URI defined in `map…$oidc_logout_redirect_uri` to specify an unprotected resource to be displayed after requesting the `/v2/_logout` location for customers who start using R29 and wants to change from `map…$oidc_logout_redirect` to `map…$oidc_logout_redirect_uri` to use the feature of [`OIDC RP-Initiated Logout`](https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout) which is interact with IdP's `end_session_endpoint`.
   - Set a unique value for `$oidc_hmac_key` to ensure nonce values are unpredictable
   - If NGINX Plus is deployed behind another proxy or load balancer, modify the `map…$redirect_base` and `map…$proto` blocks to define how to obtain the original protocol and port number.
 
