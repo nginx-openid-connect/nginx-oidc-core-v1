@@ -1,6 +1,7 @@
     # Advanced configuration START
     set $internal_error_message "NGINX / OpenID Connect login failure\n";
     set $pkce_id "";
+    set $session_id "";
     resolver 8.8.8.8; # For DNS lookup of IdP endpoints;
     subrequest_output_buffer_size 32k; # To fit a complete tokenset response
     gunzip on; # Decompress IdP responses if necessary
@@ -66,9 +67,16 @@
         error_page 500 502 504 @oidc_error;
     }
 
+    location = /_session_cookie_validation {
+        # This location is called by any endpoint to validate a session cookie.
+        internal;
+        status_zone "session cookie validation";
+        js_content oidc.validateSessionCookie;
+    }
+
     location = /logout {
         status_zone "OIDC logout";
-        add_header Set-Cookie "auth_token=; $oidc_cookie_flags"; # Send empty cookie
+        add_header Set-Cookie "session_id=; $oidc_cookie_flags"; # Send empty session cookie
         add_header Set-Cookie "auth_redir=; $oidc_cookie_flags"; # Erase original cookie
         js_content oidc.logout;
     }
@@ -84,6 +92,19 @@
         status_zone "OIDC error";
         default_type text/plain;
         return 500 $internal_error_message;
+    }
+
+    location @session_cookie_error {
+        # This location is called when oidc.validateSessionCookie()returns an error.
+        status_zone "OIDC error: session cookie";
+        default_type application/json;
+
+        # Clean cookies
+        add_header Set-Cookie "session_id=; $oidc_cookie_flags"; # Send empty session cookie
+        add_header Set-Cookie "auth_redir=; $oidc_cookie_flags"; # Erase original cookie
+
+        set $session_cookie_status '{ "message" : "invalid session cookie" }';
+        return 403 $session_cookie_status;
     }
 
     location /api/ {
